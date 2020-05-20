@@ -49,6 +49,7 @@ public class STEP_W1_HW2 {
      * @return a word has a highest score 
      */
     static String getHighPWord(ArrayList<String> allAnagrams) {
+			
     	String highPWord = "";
     	int maxScore = 0;
     	int[] scoreTable = new int[] {1,1,2,1,1,2,1,2,1,3,3,2,2,1,1,2,3,1,1,1,1,2,2,3,2,3}; 
