@@ -8,39 +8,38 @@ import java.io.FileNotFoundException;  // Import this class to handle errors
  *
  */
 public class STEP_W1_HW2 {
-	
-	// global variables
-	static String[] dict;
-	static ArrayList<String> anagrams = new ArrayList<String>();
-	
+
     public static void main(String[] args) {            
     	
     	// test for HOME WORK 2 	
-    	ArrayList<String> answers = findAnagram2("\r\n" + 
-    			"N\r\n" + 
-    			"D\r\n" + 
-    			"N\r\n" + 
-    			"X\r\n" + 
-    			"N\r\n" + 
-    			"N\r\n" + 
-    			"K\r\n" + 
-    			"S\r\n" + 
-    			"Qu\r\n" + 
-    			"M\r\n" + 
-    			"L\r\n" + 
-    			"I\r\n" + 
-    			"B\r\n" + 
-    			"N\r\n" + 
-    			"G\r\n" + 
-    			"D");
+    	startGame();
 //    	for(int i=0; i<answers.size(); i++)
 //    		System.out.println(answers.get(i));
-    	//get the word has a highest score
-    	System.out.println(getHighPWord(answers));  
     	
-//    	int[] anagram = new int[] {2,4,1,0};
-//    	int[] dict = new int[] {1,2,1,0};
-//    	System.out.println(isSubSet(dict, anagram));
+
+    }
+    static void startGame() {
+    	Scanner sc = new Scanner(System.in);
+    	// initialize settings
+    	String[] dict = createDictionary();    	// O(S)
+    	// each word in dictionary now has a char frequency table
+    	HashMap<int[], String> newDict = createNewDict(dict); 	// O(SC)
+    	ArrayList<String> anagrams = new ArrayList<String>();
+    	
+    	int count = 0;
+    	while(count < 10) {
+    		String randomW="";
+    		anagrams.clear();
+    		for(int i =0; i< 16; i++) {    			
+    			randomW += sc.next();        		
+    		}   
+    		System.out.println(randomW);
+    		ArrayList<String> answers = findAnagram2(randomW, newDict, anagrams);
+    		//get the word has a highest score
+        	System.out.println(getHighPWord(answers)); 
+        	count++;
+    	}
+    	sc.close();    	
     }
     /**
      * [HOME WORK 2] Get a word has a highest score in O(WC) time
@@ -49,7 +48,6 @@ public class STEP_W1_HW2 {
      * @return a word has a highest score 
      */
     static String getHighPWord(ArrayList<String> allAnagrams) {
-			
     	String highPWord = "";
     	int maxScore = 0;
     	int[] scoreTable = new int[] {1,1,2,1,1,2,1,2,1,3,3,2,2,1,1,2,3,1,1,1,1,2,2,3,2,3}; 
@@ -72,6 +70,7 @@ public class STEP_W1_HW2 {
     		}   			
     	}
     	highPWord.replace("q", "qu");	// back to original
+    	System.out.println(maxScore);
     	return highPWord;
     }
     /**
@@ -83,18 +82,10 @@ public class STEP_W1_HW2 {
      * @return an anagram in dictionary found first 
      * 		   an error message if it's not found
      */
-    static ArrayList<String> findAnagram2(String randomS) {
-    	randomS = randomS.replaceAll("(\\r|\\n)", "");	// trim copied string
-    	randomS = randomS.replace("Qu", "q");	// treat as one letter
-
-    	// initialize settings
-    	anagrams.clear();
-    	dict = createDictionary();    	// O(S)
+    static ArrayList<String> findAnagram2(String randomS, HashMap<int[], String> newDict, ArrayList<String> anagrams) {
+    	randomS = randomS.replace("Qu", "q");	// treat as one letter    	
     	randomS = randomS.toLowerCase();
-    	int[] table = buildCharFreqTable(randomS);	// O(C)  
-    	
-    	// each word in dictionary now has a char frequency table
-    	HashMap<int[], String> newDict = createNewDict(dict); 	// O(SC)
+    	int[] table = buildCharFreqTable(randomS);	// O(C)     	
     	
     	for(int[] i : newDict.keySet()) {	// O(S)
     		if(isSubSet(i, table)) {		// tables have common items  O(A)
