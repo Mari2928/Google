@@ -3,18 +3,18 @@ import java.util.*;
  * This program receives integer N as an input, create size N of three 2D arrays A, B, and C 
  * and store some values. Then, it calculates the product of matrices A*B and store the result into matrix C.
  * @author ashigam
- * Please change the initial value in args on line 12 to change the size of matrices. 
+ * Please change the initial value in args on line 12 to change the size of matrices.
  */
 public class STEP_W2_HW1 {
 	public static void main(String args[]) {
-		
+				
 		// input the size N
 		args = new String[]{"20"};
 		
 		if (args.length != 1) {
 			System.out.println("usage: java Matrix N");
 			return;
-		}		
+		}
 		int n = Integer.parseInt(args[0]);
 
 	    double[][] a = new double[n][n]; // Matrix A
