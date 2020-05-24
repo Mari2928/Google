@@ -8,7 +8,7 @@ import java.util.*;
 public class W2_HW1 {
 	public static void main(String args[]) {
 		
-		// input the size N
+		// input size N
 		args = new String[]{"20"};
 		
 		if (args.length != 1) {
