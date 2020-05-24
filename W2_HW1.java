@@ -29,7 +29,7 @@ public class W2_HW1 {
 		        b[i][j] = j * n + i;
 		        c[i][j] = 0;	     
 		        }
-	    }
+	    } 
 	    long begin = System.currentTimeMillis();	 
 	    
 	    /**************************************/
