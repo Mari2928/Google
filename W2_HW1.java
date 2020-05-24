@@ -23,7 +23,7 @@ public class W2_HW1 {
 	      
 	    // Initialize the matrices to some values.    
 	    int i, j;
-	    for (i = 0; i < n; i++) {
+	    for (i = 0; i < n; i++) { 
 	    	for (j = 0; j < n; j++) {
 	    		a[i][j] = i * n + j;
 		        b[i][j] = j * n + i;
