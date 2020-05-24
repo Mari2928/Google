@@ -13,7 +13,7 @@ public class STEP_W2_HW1 {
 		args = new String[]{"20"};
 		
 		if (args.length != 1) {
-			System.out.println("usage: java Matrix N");
+			System.out.println("usage: java Matrix N"); 
 			return;
 		}
 		int n = Integer.parseInt(args[0]);
