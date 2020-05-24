@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.*; 
 /**
  * This program receives integer N as an input, create size N of three 2D arrays A, B, and C 
  * and store some values. Then, it calculates the product of matrices A*B and store the result into matrix C.
