@@ -6,15 +6,15 @@ import java.util.*;
  * Please change the initial value in args on line 12 to change the size of matrices.
  */
 public class STEP_W2_HW1 {
-	public static void main(String args[])
-	  {
+	public static void main(String args[]) {
+		
 		// input the size N
 		args = new String[]{"20"};
 		
 		if (args.length != 1) {
 			System.out.println("usage: java Matrix N");
 			return;
-		}
+		}		
 		int n = Integer.parseInt(args[0]);
 
 	    double[][] a = new double[n][n]; // Matrix A
