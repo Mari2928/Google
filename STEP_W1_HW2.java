@@ -13,9 +13,6 @@ public class STEP_W1_HW2 {
 
         // test for HOME WORK 2 	
         startGame();
-    //    	for(int i=0; i<answers.size(); i++)
-    //    		System.out.println(answers.get(i));
-
 
     }
     static void startGame() {
