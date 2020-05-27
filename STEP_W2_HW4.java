@@ -1,17 +1,17 @@
 import java.util.*;
 /**
- * This program updates the cache every time URL is accessed.
- * It uses HashMap to achieve search, add, remove an element in O(1)
- * and uses customized doubly-linked-list to update the cache in O(1) 
- * except in time to remove tail. Please run cacheTest() to check test cases. 
- * @author ashigam
- */
+* This program updates the cache every time URL is accessed.
+* It uses HashMap to achieve search, add, remove an element in O(1)
+* and uses customized doubly-linked-list to update the cache in O(1) 
+* except in time to remove tail. Please run cacheTest() to check test cases. 
+* @author ashigam
+*/
 public class STEP_W2_HW4 {
 	// declare instance variables
 	private Node head;
 	private int cacheSize;
 	private HashMap<String, Node> map;
-	
+
 	/**
 	 * Constructor: initialize cache size, HashMap, and head Node 
 	 * @param N the number of cache size 
@@ -37,11 +37,11 @@ public class STEP_W2_HW4 {
 	 * @param contents the contents of the URL
 	 */
 	void accessPage(String url, String contents) {
-		
+
 		// contents are not in the map: add data to HashMap 
 		// and use the URL data as a node for DLList 
 		if(!this.map.containsKey(contents)) {	
-			
+
 			// map is full: remove tail and push to head
 			if(map.size() == cacheSize)	{	
 				removeTail();	// remove from DLList and from map
@@ -81,39 +81,39 @@ public class STEP_W2_HW4 {
 	 */
 	static void cacheTest() {
 		STEP_W2_HW4 cache = new STEP_W2_HW4(4);
-		
+
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {}));
-		
+
 		cache.accessPage("a.com", "AAA");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"a.com"}));
-		
+
 		cache.accessPage("b.com", "BBB");	
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"b.com","a.com"}));
 
 		cache.accessPage("c.com", "CCC");		
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"c.com","b.com","a.com"}));
-		
+
 		cache.accessPage("d.com", "DDD");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"d.com","c.com","b.com","a.com"}));
-		
+
 		cache.accessPage("d.com", "DDD");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"d.com","c.com","b.com","a.com"}));
-		
+
 		cache.accessPage("a.com", "AAA");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"a.com","d.com","c.com","b.com"}));
-		
+
 		cache.accessPage("c.com", "CCC");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"c.com","a.com","d.com","b.com"}));
-		
+
 		cache.accessPage("a.com", "AAA");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"a.com","c.com","d.com","b.com"}));
-		
+
 		cache.accessPage("a.com", "AAA");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"a.com","c.com","d.com","b.com"}));
-		
+
 		cache.accessPage("e.com", "EEE");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"e.com","a.com","c.com","d.com"}));
-		
+
 		cache.accessPage("f.com", "FFF");
 		System.out.println(Arrays.equals(cache.getPages(), new String[] {"f.com","e.com","a.com","c.com"}));			
 	}
