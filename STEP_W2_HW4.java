@@ -13,7 +13,7 @@ import java.util.*;
     private HashMap<String, Node> map;
 
     /**
-     * Constructor: initialize cache size, HashMap, and head Node 
+     * Constructor: initialize cache size, HashMap, and head Node.
      * @param N the number of cache size 
      */
     public STEP_W2_HW4(int N){
@@ -61,7 +61,6 @@ import java.util.*;
             moveUp(map.get(contents));
         }
     }
-    // return the URLs stored in the cache.
     /**
      * Return the URLs stored in the cache. The URLs are ordered
      * in the order in which the URLs are mostly recently accessed.
@@ -117,9 +116,8 @@ import java.util.*;
         cache.accessPage("f.com", "FFF");
         System.out.println(Arrays.equals(cache.getPages(), new String[] {"f.com","e.com","a.com","c.com"}));			
     }
-    // 
     /**
-     * Helper: Move a node up to the head by updating DLList pointers
+     * Helper: Move a node up to the head by updating DLList pointers.
      * @param u the node to be moved up
      */
     void moveUp(Node u) {
@@ -139,7 +137,7 @@ import java.util.*;
         head = u;
     }
     /**
-     * Helper: Remove a tail from DLList and from HashMap 
+     * Helper: Remove a tail from DLList and from HashMap in O(N).
      */
     void removeTail() {
         Node last = head;
@@ -151,7 +149,7 @@ import java.util.*;
         map.remove(contents);		
     }
     /**
-     * Helper: Push a node to the head of the DLList
+     * Helper: Push a node to the head of the DLList.
      * @param newN the node to be pushed to the head
      */
     void push(Node newN) {
