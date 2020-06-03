@@ -22,9 +22,10 @@ public class STEP_W3_HW3 {
      */
     double evaluate(String line) {	
         // pre_processing
-        if(line.length() == 0) return 0;
-        if(line.length() == 1 && !Character.isDigit(line.charAt(0))) return -1;	
-        if(line.contains(" "))	line = line.replaceAll("\\s+","");		
+        if(line.length() == 0) return 0;    // no input
+        if(line.length() == 1 && !Character.isDigit(line.charAt(0))) return -1;	// one symbol only
+        if(line.contains(" "))	line = line.replaceAll("\\s+","");  // has space
+        if(line.contains("/") && line.charAt(line.indexOf("/") + 1) == '0') return -1;// x/0
 
         // phase 1: process parentheses
         Token[] tokens = tokenize(processParentheses(line));
@@ -319,6 +320,7 @@ public class STEP_W3_HW3 {
         test("", 0);
         test("1", 1);		
         test("/", -1);	
+        test("3/0", -1);	// x/0 is undefined or infinity
         test(" 789 + 87 * ((100*78)  /56 )", 12906.857142857141); // user uses space  
 
         // invalid inputs (system exit)
