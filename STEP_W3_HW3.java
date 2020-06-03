@@ -69,7 +69,7 @@ public class STEP_W3_HW3 {
         return 	line.substring(0, start) + evaluate(processParentheses(newLine)) + line.substring(end+1);
     }
     /**
-     * Address consecutive parentheses.
+     * Helper: Address consecutive parentheses.
      * e.g. 2+(5/1)+(10/5) -> 2+5+2
      * @param line the string sequence of number and symbol with consecutive parentheses
      * @return the sequence of number and symbol after parentheses part of calculation
@@ -207,7 +207,7 @@ public class STEP_W3_HW3 {
         return tokens.toArray(new Token[tokens.size()]);
     }
     /**
-     * Read number and convert it to a token.
+     * Helper: Read number and convert it to a token.
      * @param line the string sequence of number and symbol
      * @return the NUMBER type of token 
      */
@@ -232,7 +232,7 @@ public class STEP_W3_HW3 {
         return new Token("NUMBER", number);
     }
     /**
-     * Read "+" symbol and convert it to a token. 
+     * Helper: Read "+" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the PLUS type of token
      */
@@ -241,7 +241,7 @@ public class STEP_W3_HW3 {
         return new Token("PLUS");
     }
     /**
-     * Read "-" symbol and convert it to a token. 
+     * Helper: Read "-" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the MINUS type of token
      */
@@ -250,7 +250,7 @@ public class STEP_W3_HW3 {
         return new Token("MINUS");
     }
     /**
-     * Read "*" symbol and convert it to a token. 
+     * Helper: Read "*" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the MULTIPLY type of token
      */
@@ -259,7 +259,7 @@ public class STEP_W3_HW3 {
         return new Token("MULTIPLY");
     }
     /**
-     * Read "/" symbol and convert it to a token. 
+     * Helper: Read "/" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the DIVIDE type of token
      */
@@ -268,7 +268,7 @@ public class STEP_W3_HW3 {
         return new Token("DIVIDE");
     }
     /**
-     * Read "(" or ")" symbol and convert it to a token. 
+     * Helper: Read "(" or ")" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the PARENTHESES type of token
      */
