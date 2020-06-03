@@ -11,8 +11,8 @@ public class STEP_W3_HW3 {
         String type;
         double number;
         // constructors
-        Token(){};										 // default
-        Token(String t){type = t;}						 // take a parameter, type
+        Token(){};  // default
+        Token(String t){type = t;}  // take a parameter, type
         Token(String t, double n){type = t; number = n;} // take parameters, type and number		
     }
     /**
