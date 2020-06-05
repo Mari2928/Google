@@ -6,14 +6,19 @@ import java.util.*;
 */
 public class STEP_W3_HW3 {
     private int index = 0;	// to keep track of index# of input line
+    
+    enum Type { NUMBER, PLUS, MINUS, MULTIPLY, DIVIDE, PARENTHESES, DUMMY; }
 
     class Token{
-        String type;
+    	Type type;
         double number;
         // constructors
         Token(){};  // default
-        Token(String t){type = t;}  // take a parameter, type
-        Token(String t, double n){type = t; number = n;} // take parameters, type and number		
+        Token(Type t){ this.type = t; } 	// take a parameter, type
+        Token(double n){	// take a number	
+        	this.type = Type.NUMBER; 
+        	this.number = n;
+        } 	
     }
     /**
      * Evaluate a string of numbers and symbols as a calculator.
@@ -56,20 +61,11 @@ public class STEP_W3_HW3 {
         if(newLine.indexOf(")") < newLine.indexOf("("))
             return consecutiveParentheses(line);
 
-        // evaluate the parentheses part recursively passing the smaller one
-        // outside () is on left 
-        if(start == 0 && end != line.length() - 1) {				
-            return evaluate(processParentheses(newLine)) + line.substring(end+1);
-        }
-        // outside () is on right
-        else if(start != 0 && end == line.length() - 1) {				
-            return line.substring(0, start) + evaluate(processParentheses(newLine)) ;
-        }
-        // outside () is in middle 			
+        // evaluate the parentheses part recursively passing the smaller one		
         return 	line.substring(0, start) + evaluate(processParentheses(newLine)) + line.substring(end+1);
     }
     /**
-     * Helper: Address consecutive parentheses.
+     * Address consecutive parentheses.
      * e.g. 2+(5/1)+(10/5) -> 2+5+2
      * @param line the string sequence of number and symbol with consecutive parentheses
      * @return the sequence of number and symbol after parentheses part of calculation
@@ -90,27 +86,27 @@ public class STEP_W3_HW3 {
         String line = "";
         int i = 1;	
         if(tokens.length == 2)	// input has 1 number
-            return line += tokens[1].number;				
+            return line += tokens[1].number;
 
         while(i < tokens.length) {
             // the last number: add it to line and return
             if(i+1 == tokens.length) {
-                if(tokens[i-1].type == "PLUS" || tokens[i-1].type == "MINUS")
+                if(tokens[i-1].type == Type.PLUS || tokens[i-1].type == Type.MINUS)
                     return line += tokens[i].number;
             }
             // look at each symbol: concatenate if '+' or '-', and calculate if '*' or '/'
-            if(tokens[i].type != "NUMBER") {
+            if(tokens[i].type != Type.NUMBER) {
 
                 // symbol is '+' or '-' 	
-                if(tokens[i].type == "PLUS" || tokens[i].type == "MINUS") {
-                    if(tokens[i-2].type != "MULTIPLY" && tokens[i-2].type != "DIVIDE") 
+                if(tokens[i].type == Type.PLUS || tokens[i].type == Type.MINUS) {
+                    if(tokens[i-2].type != Type.MULTIPLY && tokens[i-2].type != Type.DIVIDE) 
                         line += tokens[i-1].number;						
-                    if(tokens[i].type == "PLUS")	
+                    if(tokens[i].type == Type.PLUS)	
                             line += '+';
                     else	line += '-';
                 }
                 // symbol is '*' or '/' 		
-                else if(tokens[i].type == "MULTIPLY" || tokens[i].type == "DIVIDE")	{						
+                else if(tokens[i].type == Type.MULTIPLY || tokens[i].type == Type.DIVIDE)	{						
                     double result[] = totalOfMultiplyDivide(i, tokens);
                     i = (int)result[0];
                     line += result[1];						
@@ -134,13 +130,13 @@ public class STEP_W3_HW3 {
     double[] totalOfMultiplyDivide(int i, Token[] tokens) {
         double answer = tokens[i-1].number;
         while( i < tokens.length) {
-            if(tokens[i].type != "NUMBER") {
-                if(tokens[i].type == "PLUS"|| tokens[i].type == "MINUS") 
+            if(tokens[i].type != Type.NUMBER) {
+                if(tokens[i].type == Type.PLUS|| tokens[i].type == Type.MINUS) 
                     break;
-                if(tokens[i].type == "MULTIPLY")
+                if(tokens[i].type == Type.MULTIPLY)
                     answer = answer * tokens[i+1].number;
 
-                else if(tokens[i].type == "DIVIDE")
+                else if(tokens[i].type == Type.DIVIDE)
                     answer = answer/tokens[i+1].number;
                 else {
                     System.out.println("Invalid symbol: " + tokens[i].type);
@@ -160,18 +156,22 @@ public class STEP_W3_HW3 {
         double answer = 0;
         int i = 1;		
         while(i < tokens.length) {
-            if(tokens[i].type == "NUMBER") {
-                if(tokens[i-1].type == "DUMMY")
-                    answer += tokens[i].number;
-                else if(tokens[i-1].type == "PLUS")
-                    answer += tokens[i].number;
-                else if(tokens[i - 1].type == "MINUS")
-                    answer -= tokens[i].number;
-                else {
-                    System.out.println("Invalid syntax");
-                    System.exit(1);
-                }
-            }	
+        	if(tokens[i].type == Type.NUMBER) {
+        		switch(tokens[i-1].type) {
+        			case DUMMY:
+        				answer += tokens[i].number;
+                		break;          		
+        			case PLUS:
+        				answer += tokens[i].number;
+        				break;
+        			case MINUS:
+        				answer -= tokens[i].number;
+        				break;
+            		default:
+            			System.out.println("Invalid syntax");
+                        System.exit(1);            	 
+            	}
+        	}        	
             i++;
         }// end of while
         return answer;				
@@ -183,7 +183,7 @@ public class STEP_W3_HW3 {
      */
     Token[] tokenize(String line) {
         ArrayList<Token> tokens = new ArrayList<>();
-        tokens.add(new Token("DUMMY"));	// insert a dummy token
+        tokens.add(new Token(Type.DUMMY));	// insert a dummy token
         index = 0;
 
         while(index < line.length()) {
@@ -207,7 +207,7 @@ public class STEP_W3_HW3 {
         return tokens.toArray(new Token[tokens.size()]);
     }
     /**
-     * Helper: Read number and convert it to a token.
+     * Read number and convert it to a token.
      * @param line the string sequence of number and symbol
      * @return the NUMBER type of token 
      */
@@ -229,53 +229,59 @@ public class STEP_W3_HW3 {
                 index++;
             }			
         }
-        return new Token("NUMBER", number);
+        return new Token(number);
     }
     /**
-     * Helper: Read "+" symbol and convert it to a token. 
+     * Read "+" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the PLUS type of token
      */
     Token readPlus(String line) {
         index++;
-        return new Token("PLUS");
+        return new Token(Type.PLUS);
     }
     /**
-     * Helper: Read "-" symbol and convert it to a token. 
+     * Read "-" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the MINUS type of token
      */
     Token readMinus(String line) {
         index++;
-        return new Token("MINUS");
+        return new Token(Type.MINUS);
     }
     /**
-     * Helper: Read "*" symbol and convert it to a token. 
+     * Read "*" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the MULTIPLY type of token
      */
     Token readProduct(String line) {
         index++;
-        return new Token("MULTIPLY");
+        return new Token(Type.MULTIPLY);
     }
     /**
-     * Helper: Read "/" symbol and convert it to a token. 
+     * Read "/" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the DIVIDE type of token
      */
     Token readDivide(String line) {
         index++;
-        return new Token("DIVIDE");
+        return new Token(Type.DIVIDE);
     }
     /**
-     * Helper: Read "(" or ")" symbol and convert it to a token. 
+     * Read "(" or ")" symbol and convert it to a token. 
      * @param line the string sequence of number and symbol
      * @return the PARENTHESES type of token
      */
     Token readParentheses(String line) {
         index++;
-        return new Token("PARENTHESES");
+        return new Token(Type.PARENTHESES);
     }
+//    int readXxxx(String line, int index, ArrayList<Token> tokens) {
+//        // line の index 番目から Xxxx を読み込む
+//        Token token = new Token(...);
+//        tokens.add(token);  // 引数で受け取った tokens に追加する
+//        return new_index;  // line の続きを読み込むための新しい index を返す
+//    }
     /**
      * Check a test case.
      * @param line the string sequence of number and symbol
