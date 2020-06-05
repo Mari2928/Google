@@ -156,22 +156,22 @@ public class STEP_W3_HW3 {
         double answer = 0;
         int i = 1;		
         while(i < tokens.length) {
-        	if(tokens[i].type == Type.NUMBER) {
-        		switch(tokens[i-1].type) {
-        			case DUMMY:                        
-        				answer += tokens[i].number;
-                		break;          		
-        			case PLUS:
-        				answer += tokens[i].number;
-        				break;
-        			case MINUS:
-        				answer -= tokens[i].number;
-        				break;
-            		default:
-            			System.out.println("Invalid syntax");
+            if(tokens[i].type == Type.NUMBER) {
+                switch(tokens[i-1].type) {
+                    case DUMMY:                        
+                        answer += tokens[i].number;
+                        break;          		
+                    case PLUS:
+                        answer += tokens[i].number;
+                        break;
+                    case MINUS:
+                        answer -= tokens[i].number;
+                        break;
+                    default:
+                        System.out.println("Invalid syntax");
                         System.exit(1);            	 
-            	}
-        	}        	
+                }
+            }        	
             i++;
         }// end of while
         return answer;				
