@@ -158,7 +158,7 @@ public class STEP_W3_HW3 {
         while(i < tokens.length) {
         	if(tokens[i].type == Type.NUMBER) {
         		switch(tokens[i-1].type) {
-        			case DUMMY:
+        			case DUMMY:                        
         				answer += tokens[i].number;
                 		break;          		
         			case PLUS:
