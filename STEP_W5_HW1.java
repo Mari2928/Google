@@ -8,7 +8,7 @@ import java.io.IOException;
 * Greedy, Two-Opt, Nearest Neighbor, and Nearest Insertion, to solve TSP.
 * @author ashigam
 */
-    public class STEP_W5_HW1 {    
+public class STEP_W5_HW1 {    
 
     /**
      * Get the distance between 2 cities.
@@ -45,36 +45,14 @@ import java.io.IOException;
         double[][] dist = allDistance(cities, N);
 
         //try Nearest Neighbor algorithm using Greedy and Two-Opt
-        ArrayList<Integer> tour = nearestNeighbor(N, dist);	
-
+        ArrayList<Integer> tour = nearestNeighbor(N, dist);			
         System.out.print("twoOpt: "+ getTotalDistance(tour, dist) +"|");
+
         // try Nearest Insertion algorithm to improve 
         tour = nearestInsertion(tour, dist);
-
         System.out.println("insertion "+getTotalDistance(tour, dist));
 
         return tour.toArray(new Integer[tour.size()]);							
-    }
-    /**
-     * Two-Opt: Improve a path by swapping two cities which edges are crossed.
-     * @param tour the list of city numbers as a tour path
-     * @param dist the list of distances from each city to every cities
-     * @param i the starting index number of the path to be extracted
-     * @param k the ending index number of the path to be extracted
-     * @return the list of improved tour path
-     */
-    ArrayList<Integer> twoOpt(ArrayList<Integer> tour, double[][] dist, int i, int k){
-        ArrayList<Integer> newTour = new ArrayList<>();
-        for(int c = 0; c <= i-1; c++)
-            newTour.add(tour.get(c));
-        int dec = 0;
-        for(int c = i; c <= k; c++) {
-            newTour.add(tour.get(k - dec));
-            dec++;
-        }
-        for(int c = k+1; c < tour.size(); c++)			
-            newTour.add(tour.get(c));					
-        return newTour;
     }
     /**
      * Nearest Insertion: Take a sub-tour on each city to determine
@@ -163,8 +141,18 @@ import java.io.IOException;
             tour.add(nextCity);
             currentCity = nextCity;
         }
-        //Integer[] t = tour.toArray(new Integer[tour.size()]);
-        // improve the tour path with Two-Opt heuristic
+        // improve the tour path with Two-Opt heuristic if N (cities) < 150
+        int N = dist.length;
+        if(N < 150)	tour = improveWithTwoOpt( tour, dist);
+        return tour;
+    }
+    /**
+     * Improve a path using Two-Opt while traveling with Greedy.
+     * @param tour the list of city numbers as a tour path 
+     * @param dist the list of distances from each city to every cities
+     * @return the list of improved tour path
+     */
+    ArrayList<Integer> improveWithTwoOpt(ArrayList<Integer> tour, double[][] dist){
         int improved = 0;
         while(improved < 2) {
             double bestDist = getTotalDistance(tour, dist);
@@ -176,13 +164,33 @@ import java.io.IOException;
                         improved = 0;
                         bestDist = newDist;
                         tour = newTour;
-                        //continue;
                     }
                 }
             }
             improved++;
         }
         return tour;
+    }
+    /**
+     * Two-Opt: Improve a path by swapping two cities which edges are crossed.
+     * @param tour the list of city numbers as a tour path
+     * @param dist the list of distances from each city to every cities
+     * @param i the starting index number of the path to be extracted
+     * @param k the ending index number of the path to be extracted
+     * @return the list of improved tour path
+     */
+    ArrayList<Integer> twoOpt(ArrayList<Integer> tour, double[][] dist, int i, int k){
+        ArrayList<Integer> newTour = new ArrayList<>();
+        for(int c = 0; c <= i-1; c++)
+            newTour.add(tour.get(c));
+        int dec = 0;
+        for(int c = i; c <= k; c++) {
+            newTour.add(tour.get(k - dec));
+            dec++;
+        }
+        for(int c = k+1; c < tour.size(); c++)			
+            newTour.add(tour.get(c));					
+        return newTour;
     }
     /**
      * Helper: Find a next closest city.
@@ -266,7 +274,7 @@ import java.io.IOException;
         String inFile = "bin/input_0.csv";
         String OutFile = "bin/output_0.csv";    	
 
-        while(N < 6) {    		
+        while(N < 7) {    		
             inFile = inFile.substring(0, 10)+String.valueOf(N)+inFile.substring(11);        	
             Double[][] cities = test.readCSV(inFile);
 
