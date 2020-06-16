@@ -4,8 +4,8 @@ import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
 /**
-* This program is for studying and experimenting the following algorithms:
-* Greedy, Nearest Neighbor, and Nearest Insertion, to solve TSP.
+* This program is for studying and experimenting the following algorithms/heuristics:
+* Greedy, Two-Opt, Nearest Neighbor, and Nearest Insertion, to solve TSP.
 * @author ashigam
 */
     public class STEP_W5_HW1 {    
@@ -44,23 +44,45 @@ import java.io.IOException;
         int N = cities.length;
         double[][] dist = allDistance(cities, N);
 
-        //try Nearest Neighbor algorithm
-        ArrayList<Integer> tour = nearestNeighbor(N, dist);				
+        //try Nearest Neighbor algorithm using Greedy and Two-Opt
+        ArrayList<Integer> tour = nearestNeighbor(N, dist);	
 
+        System.out.print("twoOpt: "+ getTotalDistance(tour, dist) +"|");
         // try Nearest Insertion algorithm to improve 
         tour = nearestInsertion(tour, dist);
 
-        System.out.println(getTotalDistance(tour, dist));
+        System.out.println("insertion "+getTotalDistance(tour, dist));
 
         return tour.toArray(new Integer[tour.size()]);							
+    }
+    /**
+     * Two-Opt: Improve a path by swapping two cities which edges are crossed.
+     * @param tour the list of city numbers as a tour path
+     * @param dist the list of distances from each city to every cities
+     * @param i the starting index number of the path to be extracted
+     * @param k the ending index number of the path to be extracted
+     * @return the list of improved tour path
+     */
+    ArrayList<Integer> twoOpt(ArrayList<Integer> tour, double[][] dist, int i, int k){
+        ArrayList<Integer> newTour = new ArrayList<>();
+        for(int c = 0; c <= i-1; c++)
+            newTour.add(tour.get(c));
+        int dec = 0;
+        for(int c = i; c <= k; c++) {
+            newTour.add(tour.get(k - dec));
+            dec++;
+        }
+        for(int c = k+1; c < tour.size(); c++)			
+            newTour.add(tour.get(c));					
+        return newTour;
     }
     /**
      * Nearest Insertion: Take a sub-tour on each city to determine
      * which city should be selected to be inserted as well as 
      * where (between which two cities) it should be inserted. 
-     * @param tour
-     * @param dist
-     * @return
+     * @param tour the list of city numbers as a tour path 
+     * @param dist the list of distances from each city to every cities
+     * @return the list of city numbers as the improved tour path
      */
     ArrayList<Integer> nearestInsertion(ArrayList<Integer> tour , double[][] dist){
         // make a sub-tour list
@@ -134,7 +156,7 @@ import java.io.IOException;
         ArrayList<Integer> tour = new ArrayList<>();
         tour.add(currentCity);
         // start traveling
-        while(!unvisitedCities.isEmpty()) {
+        while(!unvisitedCities.isEmpty()) {			
             int nextCityNum = min(unvisitedCities, currentCity, dist);
             int nextCity = unvisitedCities.get(nextCityNum);
             unvisitedCities.remove(nextCityNum);
@@ -142,6 +164,24 @@ import java.io.IOException;
             currentCity = nextCity;
         }
         //Integer[] t = tour.toArray(new Integer[tour.size()]);
+        // improve the tour path with Two-Opt heuristic
+        int improved = 0;
+        while(improved < 2) {
+            double bestDist = getTotalDistance(tour, dist);
+            for(int i = 0; i < tour.size()-1; i++) {
+                for(int k = 0; k <tour.size(); k++) {
+                    ArrayList<Integer> newTour = twoOpt(tour, dist, i, k);
+                    double newDist = getTotalDistance(newTour, dist);
+                    if(newDist < bestDist) {
+                        improved = 0;
+                        bestDist = newDist;
+                        tour = newTour;
+                        //continue;
+                    }
+                }
+            }
+            improved++;
+        }
         return tour;
     }
     /**
@@ -221,7 +261,7 @@ import java.io.IOException;
     public static void main(String args[]) {	
         STEP_W5_HW1 test = new STEP_W5_HW1();  
 
-        // generate inputs and outputs for 6 challenges
+        // generate inputs and outputs
         int N = 0;
         String inFile = "bin/input_0.csv";
         String OutFile = "bin/output_0.csv";    	
@@ -236,6 +276,5 @@ import java.io.IOException;
             test.writeCSV(tour, OutFile);
             N++;
         }
-
     }
 }
