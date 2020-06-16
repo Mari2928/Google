@@ -44,13 +44,17 @@ public class STEP_W5_HW1 {
         int N = cities.length;
         double[][] dist = allDistance(cities, N);
 
-        //try Nearest Neighbor algorithm using Greedy and Two-Opt
-        ArrayList<Integer> tour = nearestNeighbor(N, dist);			
-        System.out.print("twoOpt: "+ getTotalDistance(tour, dist) +"|");
+        //try Nearest Neighbor algorithm using Greedy
+        ArrayList<Integer> tour = nearestNeighbor(N, dist);	
+        System.out.print("neighbor: "+ getTotalDistance(tour, dist) +"|");
+
+        // improve tour path using Two-Opt heuristic
+        tour = improveWithTwoOpt(tour, dist);
+        System.out.print("two-opt: "+ getTotalDistance(tour, dist) +"|");
 
         // try Nearest Insertion algorithm to improve 
         tour = nearestInsertion(tour, dist);
-        System.out.println("insertion "+getTotalDistance(tour, dist));
+        System.out.println("insertion: "+getTotalDistance(tour, dist));
 
         return tour.toArray(new Integer[tour.size()]);							
     }
@@ -99,7 +103,6 @@ public class STEP_W5_HW1 {
         int currentCity = 0;
         double min = Double.MAX_VALUE;
         ArrayList<Integer> unvisitedCities = new ArrayList<>();
-        //Integer[] tour = new Integer[0];
         ArrayList<Integer> result = new ArrayList<>();
         while(currentCity < N) {				
             buildUnvisitedCities(N, unvisitedCities, currentCity);		
@@ -141,9 +144,6 @@ public class STEP_W5_HW1 {
             tour.add(nextCity);
             currentCity = nextCity;
         }
-        // improve the tour path with Two-Opt heuristic if N (cities) < 150
-        int N = dist.length;
-        if(N < 150)	tour = improveWithTwoOpt( tour, dist);
         return tour;
     }
     /**
@@ -274,7 +274,7 @@ public class STEP_W5_HW1 {
         String inFile = "bin/input_0.csv";
         String OutFile = "bin/output_0.csv";    	
 
-        while(N < 7) {    		
+        while(N <= 6) {    		
             inFile = inFile.substring(0, 10)+String.valueOf(N)+inFile.substring(11);        	
             Double[][] cities = test.readCSV(inFile);
 
