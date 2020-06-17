@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 /**
 * This program is for studying and experimenting the following algorithms/heuristics:
-* Greedy, Two-Opt, Nearest Neighbor, and Nearest Insertion, to solve TSP.
+* Greedy, Two-Opt, Nearest Neighbor, Nearest Insertion, and Farthest Insertion to solve TSP.
 * @author ashigam
 */
 public class STEP_W5_HW1 {    
@@ -44,19 +44,50 @@ public class STEP_W5_HW1 {
         int N = cities.length;
         double[][] dist = allDistance(cities, N);
 
-        //try Nearest Neighbor algorithm using Greedy
+        // try Nearest Neighbor using Greedy improving with Two-Opt
         ArrayList<Integer> tour = nearestNeighbor(N, dist);	
-        System.out.print("neighbor: "+ getTotalDistance(tour, dist) +"|");
+        System.out.print("neighbor & two-opt: "+ getTotalDistance(tour, dist) +"|");
 
-        // improve tour path using Two-Opt heuristic
-        tour = improveWithTwoOpt(tour, dist);
-        System.out.print("two-opt: "+ getTotalDistance(tour, dist) +"|");
+        // try Nearest Insertion to improve 
+    //		tour = nearestInsertion(tour, dist);
+    //		System.out.print("nearest: "+getTotalDistance(tour, dist) +"|");
 
-        // try Nearest Insertion algorithm to improve 
-        tour = nearestInsertion(tour, dist);
-        System.out.println("insertion: "+getTotalDistance(tour, dist));
+        // Farthest Insertion is selected as it performs better than Nearest Insertion
+        tour = farthestInsertion(tour, dist);
+        System.out.println("farthest: "+getTotalDistance(tour, dist));
 
         return tour.toArray(new Integer[tour.size()]);							
+    }
+    /**
+     * Farthest Insertion:
+     * @param tour
+     * @param dist
+     * @return
+     */
+    ArrayList<Integer> farthestInsertion(ArrayList<Integer> tour , double[][] dist){
+        // make a sub-tour list
+        ArrayList<Integer> candidates = new ArrayList<>();
+        for(int i = 0; i < tour.size(); i++)	
+            candidates.add(tour.get(i));
+
+        for(int i = candidates.size()-1; i >= 0 ; i--) {
+            int insId = candidates.get(i);  // candidate city			
+            int h = tour.indexOf(insId);	// city index on tour list
+            tour.remove(h);
+            double incmin = Double.MAX_VALUE;
+            int posmin = -1;
+            for(int n = 1; n <= tour.size(); n++) {
+                double inc = dist[tour.get(n-1)][insId] 
+                             + dist[insId][tour.get(n%tour.size())]
+                             - dist[tour.get(n-1)][tour.get(n%tour.size())];
+                if(n==h? inc <= incmin : inc < incmin) {
+                    posmin = n;
+                    incmin = inc;
+                }
+            }
+            tour.add(posmin, insId);// insert the candidate to farthest location
+        }				
+        return tour;
     }
     /**
      * Nearest Insertion: Take a sub-tour on each city to determine
@@ -111,6 +142,9 @@ public class STEP_W5_HW1 {
             result = (min == getTotalDistance(tour, dist))? tour : result; 	
             currentCity++;
         }
+        // do twoOpt for one tour if input cities >= 150
+    //		if(N >= 150) 
+    //			result = improveWithTwoOpt(result, dist);				
         return result;
     }
     /**
@@ -144,6 +178,9 @@ public class STEP_W5_HW1 {
             tour.add(nextCity);
             currentCity = nextCity;
         }
+        // do twoOpt for every combinations of tours if input cities < 150
+        //if(dist.length < 150) 
+            tour = improveWithTwoOpt(tour, dist);
         return tour;
     }
     /**
@@ -154,7 +191,7 @@ public class STEP_W5_HW1 {
      */
     ArrayList<Integer> improveWithTwoOpt(ArrayList<Integer> tour, double[][] dist){
         int improved = 0;
-        while(improved < 2) {
+        while(improved < 15) {
             double bestDist = getTotalDistance(tour, dist);
             for(int i = 0; i < tour.size()-1; i++) {
                 for(int k = 0; k <tour.size(); k++) {
@@ -270,11 +307,11 @@ public class STEP_W5_HW1 {
         STEP_W5_HW1 test = new STEP_W5_HW1();  
 
         // generate inputs and outputs
-        int N = 0;
+        int N = 5;
         String inFile = "bin/input_0.csv";
         String OutFile = "bin/output_0.csv";    	
 
-        while(N <= 6) {    		
+        while(N <= 5) {    		
             inFile = inFile.substring(0, 10)+String.valueOf(N)+inFile.substring(11);        	
             Double[][] cities = test.readCSV(inFile);
 
