@@ -223,23 +223,20 @@ void* my_malloc(size_t size) {
     //printf("%lu\n", size);
     simple_metadata_t* metadata = simple_heap.free_head;
     simple_metadata_t* prev = NULL;
-    simple_metadata_t* best = NULL;
-
     unsigned long min = ULONG_MAX;
-
     simple_metadata_t* temp = NULL;
     simple_metadata_t* temp_prev = NULL;
 
-    // First-fit: Find the first free slot the object fits.
+    // Best-fit: Find the best free slot the object fits.
     while (metadata) {
         if(metadata->size == size){
             void* ptr = metadata + 1;
             simple_remove_from_free_list(metadata, prev);
             return ptr;
         }
-        else if(metadata->size > size) {
-        //else if(metadata->size > size && metadata->size - size < min){
-           // min = metadata->size - size;
+        //else if(metadata->size > size) {
+        else if(metadata->size > size && metadata->size - size < min){
+            min = metadata->size - size;
             temp_prev = prev;
             temp=metadata;  
         }
