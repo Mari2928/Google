@@ -211,14 +211,23 @@ void simple_free(void* ptr) {
 // [My malloc]
 //
 // Your job is to invent a smarter malloc algorithm here :)
-
+simple_metadata_t* my_start;
 // This is called only once at the beginning of each challenge.
 void my_initialize() {
   simple_heap.free_head = &simple_heap.dummy;
   simple_heap.dummy.size = 0;
   simple_heap.dummy.next = NULL;
+  my_start = 0;
 }
-
+void* mmap_process(){
+    size_t buffer_size = 4096;
+    simple_metadata_t* metadata = (simple_metadata_t*)mmap_from_system(buffer_size);
+    my_start = metadata;    // keep it for munmap
+    metadata->size = buffer_size - sizeof(simple_metadata_t);
+    metadata->next = NULL;
+    // Add the memory region to the free list.        
+    simple_add_to_free_list(metadata);
+}
 // This is called every time an object is allocated. |size| is guaranteed
 // to be a multiple of 8 bytes and meets 8 <= |size| <= 4000. You are not
 // allowed to use any library functions other than mmap_from_system /
@@ -230,8 +239,19 @@ void* my_malloc(size_t size) {
     simple_metadata_t* best = NULL;
     simple_metadata_t* best_prev = NULL;
 
+    size_t heap_size = 0;
+
     // Best-fit: Find the best free slot the object fits.
     while (metadata) {
+        heap_size +=  metadata->size + sizeof(metadata);
+        // return to system if the taken 4KB is free
+        if(heap_size > 4096){ 
+            munmap_to_system(my_start, 4096); 
+            printf("%s\n", "unmap success");
+            my_initialize();
+            mmap_process();                
+            return my_malloc(size);                      
+         }
         if(metadata->size == size){
             void* ptr = metadata + 1;
             simple_remove_from_free_list(metadata, prev);
@@ -248,21 +268,9 @@ void* my_malloc(size_t size) {
     }
     prev = best_prev;
     metadata = best;        
-    
-    // First-fit: Find the first free slot the object fits.
-    // while (metadata && metadata->size < size) {
-    //     prev = metadata;
-    //     metadata = metadata->next;
-    // }
-    
+
     if (!metadata) {
-        //printf("%s\n", "mmap called");
-        size_t buffer_size = 4096;
-        simple_metadata_t* metadata = (simple_metadata_t*)mmap_from_system(buffer_size);
-        metadata->size = buffer_size - sizeof(simple_metadata_t);
-        metadata->next = NULL;
-        // Add the memory region to the free list.        
-        simple_add_to_free_list(metadata);
+        mmap_process();
         // Now, try simple_malloc() again. This should succeed.
         return my_malloc(size);
     }
@@ -294,7 +302,7 @@ void* my_malloc(size_t size) {
 // any library functions other than mmap_from_system / munmap_to_system.
 void my_free(void* ptr) {    
     simple_metadata_t* metadata = (simple_metadata_t*)ptr - 1;
-    simple_metadata_t* next_metadata = (simple_metadata_t*)(ptr + metadata->size);   
+    simple_metadata_t* next_metadata = (simple_metadata_t*)(ptr) + metadata->size;   
    
     // next is not free
     if(next_metadata != NULL){
@@ -304,15 +312,10 @@ void my_free(void* ptr) {
     // next is free: go through the free list
     simple_metadata_t* free = simple_heap.free_head;
     simple_metadata_t* prev = NULL;
-    size_t heap_size = 0;
     
     // combine if next metadata is free
     while(free){        
-        heap_size +=  free->size + sizeof(free);
-        // if(heap_size >= 4096){ 
-        //     void* head_ptr = simple_heap.free_head + 1;
-        //     munmap_to_system(head_ptr, 4096);
-        //  }
+        
         if(next_metadata == free){       
             size_t tempsize = metadata->size + free->size + sizeof(metadata); 
             simple_remove_from_free_list(free, prev);
@@ -338,31 +341,30 @@ void my_free(void* ptr) {
 
 void test() {
   my_initialize();
-  void* p1 = my_malloc(100);  
-  void* p2 = my_malloc(200);  
-  void* p3 = my_malloc(300);  
-  void* p4 = my_malloc(400);
-  void* p5 = my_malloc(200);
-  void* p6 = my_malloc(500);
-  my_free(p1);
-  my_free(p2);
-  my_free(p3);
-  my_free(p4);
-  my_free(p5);
-  my_free(p6);
-  
+//   void* p1 = my_malloc(100);  
+//   void* p2 = my_malloc(200);  
+//   void* p3 = my_malloc(300);  
+//   void* p4 = my_malloc(400);
+//   void* p5 = my_malloc(200);
+//   void* p6 = my_malloc(500);
+//   my_free(p1);
+//   my_free(p2);
+//   my_free(p3);
+//   my_free(p4);
+//   my_free(p5);
+//   my_free(p6);
 
-//   for (int i = 0; i < 2; i++) {
+//   for (int i = 0; i < 100; i++) {
 //     void* ptr = my_malloc(96);
 //     my_free(ptr);
 //   }
-//    void* ptrs[100];
-//   for (int i = 0; i < 6; i++) {
-//     ptrs[i] = my_malloc(96);
-//   }
-//   for (int i = 0; i < 1; i++) {
-//     my_free(ptrs[i]);
-//   }
+   void* ptrs[100];
+  for (int i = 0; i < 100; i++) {
+    ptrs[i] = my_malloc(96);
+  }
+  for (int i = 0; i < 30; i++) {
+    my_free(ptrs[i]);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
