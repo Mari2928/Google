@@ -219,6 +219,8 @@ void my_initialize() {
   simple_heap.dummy.next = NULL;
   my_start = 0;
 }
+
+// Modulelized mmap process.
 void* mmap_process(){
     size_t buffer_size = 4096;
     simple_metadata_t* metadata = (simple_metadata_t*)mmap_from_system(buffer_size);
@@ -228,6 +230,7 @@ void* mmap_process(){
     // Add the memory region to the free list.        
     simple_add_to_free_list(metadata);
 }
+
 // This is called every time an object is allocated. |size| is guaranteed
 // to be a multiple of 8 bytes and meets 8 <= |size| <= 4000. You are not
 // allowed to use any library functions other than mmap_from_system /
