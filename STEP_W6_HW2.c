@@ -217,7 +217,6 @@ void my_initialize() {
   simple_heap.free_head = &simple_heap.dummy;
   simple_heap.dummy.size = 0;
   simple_heap.dummy.next = NULL;
-  total_size = 0; // added to keep track of the current heap total size
 }
 
 // This is called every time an object is allocated. |size| is guaranteed
@@ -262,11 +261,8 @@ void* my_malloc(size_t size) {
         simple_metadata_t* metadata = (simple_metadata_t*)mmap_from_system(buffer_size);
         metadata->size = buffer_size - sizeof(simple_metadata_t);
         metadata->next = NULL;
-        // Add the memory region to the free list.
-        
+        // Add the memory region to the free list.        
         simple_add_to_free_list(metadata);
-        //total_size += metadata->size;
-        //printf("after mmap total : %lu\n", total_size);
         // Now, try simple_malloc() again. This should succeed.
         return my_malloc(size);
     }
@@ -292,57 +288,45 @@ void* my_malloc(size_t size) {
         // Add the remaining free slot to the free list.
         simple_add_to_free_list(new_metadata);
     }
-    //total_size -= size + sizeof(metadata);
     return ptr;
 }
 // This is called every time an object is freed.  You are not allowed to use
 // any library functions other than mmap_from_system / munmap_to_system.
 void my_free(void* ptr) {    
-    //printf("current heap: %lu\n", total_size);
     simple_metadata_t* metadata = (simple_metadata_t*)ptr - 1;
-    simple_metadata_t* free = simple_heap.free_head;
     simple_metadata_t* next_metadata = (simple_metadata_t*)(ptr + metadata->size);   
+   
+    // next is not free
+    if(next_metadata != NULL){
+        simple_add_to_free_list(metadata);
+        return;
+    }
+    // next is free: go through the free list
+    simple_metadata_t* free = simple_heap.free_head;
     simple_metadata_t* prev = NULL;
-
-    //ADDED: combine if next metadata is free
+    size_t heap_size = 0;
+    
+    // combine if next metadata is free
     while(free){        
-        if(next_metadata == free){            
+        heap_size +=  free->size + sizeof(free);
+        // if(heap_size >= 4096){ 
+        //     void* head_ptr = simple_heap.free_head + 1;
+        //     munmap_to_system(head_ptr, 4096);
+        //  }
+        if(next_metadata == free){       
             size_t tempsize = metadata->size + free->size + sizeof(metadata); 
             simple_remove_from_free_list(free, prev);
-            
-            // total_size -= free->size + sizeof(free);
-            // total_size += metadata->size + sizeof(metadata);
 
             metadata->next = simple_heap.free_head->next;
             simple_heap.free_head->next = NULL;
 
             metadata->size = tempsize;           
             simple_heap.free_head = metadata;
-
-            //total_size -= simple_heap.free_head->size;
-
-            // simple_metadata_t* list = simple_heap.free_head;
-            //     printf("current heap(mid)\n");
-            //     while(list){
-            //         printf("%lu |", list->size);
-            //         list = list->next;
-            //     }printf("\n");
             return;
         }
         prev = free;
         free = free->next;
-    }
-    // Add the free slot to the free list.
-    simple_add_to_free_list(metadata);
-    //total_size += metadata->size + sizeof(metadata);
-
-
-    // simple_metadata_t* list = simple_heap.free_head;
-    // printf("current heap(default)\n");
-    // while(list){
-    //     printf("%lu |", list->size);
-    //     list = list->next;
-    // }printf("\n");
+    }    
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -679,6 +663,5 @@ int main(int argc, char** argv) {
   srand(12);  // Set the rand seed to make the challenges non-deterministic.
   //test();
   run_challenges();
-  printf("freed size: %lu\n",stats.freed_size);
   return 0;
 }
