@@ -53,7 +53,7 @@ public class STEP_W6_HW3 {
 
         // Nearest Neighbor with Greedy and partial Two-Opt
         // open multiple terminals, select some start cities, and find a best city on each terminal
-        ArrayList<Integer> bestCity = nearestNeighborFindBest(128, dist, startCity); // 30 different starting cities 
+        ArrayList<Integer> bestCity = nearestNeighborFindBest(30, dist, startCity); // 30 different starting cities 
 
         // focus on one start city to apply full Two-Opt
         ArrayList<Integer> tour = improveBestCity(dist, bestCity);
@@ -123,9 +123,8 @@ public class STEP_W6_HW3 {
 
     /**
      * Nearest Neighbor with partial improve to find a best start city: 
-     * Starting from the current city, repeat the greedy algorithm N times 
-     * where N as the number of cities by setting each city as a starting point
-     * and find a minimum path within the tour paths.
+     * Starting from the current city, repeat the greedy algorithm N times where N as the number of cities
+     * by setting each city as a starting point and find a minimum path within the tour paths.
      * @param N the number of cities
      * @param dist the list of distances from each city to every cities
      * @param currentCity the current city number
@@ -158,8 +157,6 @@ public class STEP_W6_HW3 {
      * @return the list of city numbers as a tour path
      */
     ArrayList<Integer> improveBestCity(double[][] dist, ArrayList<Integer> bestCity) {        	
-    //        ArrayList<Integer> tour = greedy(bestCity, dist);
-    //        bestCity = ;
         return improveWithFullTwoOpt(bestCity, dist);
     }
 
@@ -348,8 +345,8 @@ public class STEP_W6_HW3 {
         STEP_W6_HW3 test = new STEP_W6_HW3();  
 
         // generate inputs and outputs 
-        String inFile = "bin/input_4.csv";
-        String OutFile = "bin/outpu_4.csv";
+        String inFile = "bin/input_6.csv";
+        String OutFile = "bin/outpu_6.csv";
 
         Scanner sc = new Scanner(System.in);
 
