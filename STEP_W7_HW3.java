@@ -5,11 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 /**
 * This program aims to find a better solution for a large number of cities over 2048 for TSP.
-* Entering the city number to start traveling, it searches N (set to 30 by default) different paths 
+* After a user enters the city number to start traveling, it searches N (set to 30 by default) different paths 
 * incrementing the starting city number (Greedy + partial Two-Opt), 
-* find the best city to be improved (Nearest Neighbor), and generates 
+* finds the best city to be improved (Nearest Neighbor), and generates 
 * one fully improved tour path within the paths (full Two-opt + Farthest Insertion).
-* Find a better solution by using multiple terminals distributing the searching part.
+* You can find a better solution by using multiple terminals distributing the searching part.
 * @author ashigam
 */
 public class STEP_W7_HW3 {    
