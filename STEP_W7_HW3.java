@@ -4,11 +4,10 @@ import java.util.*;
 import java.io.FileWriter;
 import java.io.IOException;
 /**
-* This program aims to find a better solution for a large number of cities over 2048 for TSP.
+* This program is designed to find the shortest route to visit a large number of cities ( > 2,048) for TSP.
 * After a user enters the city number to start traveling, it searches N (set to 30 by default) different paths 
-* incrementing the starting city number (Greedy + partial Two-Opt), 
-* finds the best city to be improved (Nearest Neighbor), and generates 
-* one fully improved tour path within the paths (full Two-opt + Farthest Insertion).
+* incrementing the starting city number (Greedy + partial Two-Opt), finds the best path that the program can improve the most
+* within the paths (Nearest Neighbor), and generates one fully improved tour path (full Two-opt + Farthest Insertion).
 * You can find a better solution by using multiple terminals distributing the searching part.
 * @author ashigam
 */
