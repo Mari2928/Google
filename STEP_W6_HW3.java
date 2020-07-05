@@ -9,7 +9,7 @@ import java.io.IOException;
 * incrementing the starting city number (Greedy + partial Two-Opt), 
 * find the best city to be improved (Nearest Neighbor), and generates 
 * one fully improved tour path within the paths (full Two-opt + Farthest Insertion).
-* Find a better solution by using multiple terminals diversifying the searching part.
+* Find a better solution by using multiple terminals distributing the searching part.
 * @author ashigam
 */
 public class STEP_W6_HW3 {    
