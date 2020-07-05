@@ -12,7 +12,7 @@ import java.io.IOException;
 * Find a better solution by using multiple terminals distributing the searching part.
 * @author ashigam
 */
-public class STEP_W6_HW3 {    
+public class STEP_W7_HW3 {    
 
     /**
      * Get the distance between 2 cities.
