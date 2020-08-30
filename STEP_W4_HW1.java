@@ -1,109 +1,163 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Queue;
 /**
 * This program helps investigating SNS followers relationship.
 * Please run main() to see the result of some unit tests and the result of SNS investigation.
 * @author ashigam
 */
-public class STEP_W4_HW1 {    
+    public class STEP_W4_HW1 {    
 
-    enum State { Unvisited, Visited, Visiting; }
+    enum State { Unvisited, Visited; }
 
-    class Graph{
-        // to get the node from a given name
-        public Node[] nodes;
+    class Graph{    	
+        public Node[] nodes; // to get the node from a given name
         Graph(int V){ this.nodes = new Node[V]; }
     }
+
     class Node{	
         public String name;
-        public int nodeNumber;
-        public int score = 100;
+        public int number;    	
         public State state = State.Unvisited;
         public ArrayList<Node> followers = new ArrayList<>();
+
+        public int score = 100;
+
         Node(){}
-        Node(int i){ this.nodeNumber = i;}
+        Node(int i){ this.number = i;}
         Node(int i, String n){ 
-            this.nodeNumber = i; 
+            this.number = i; 
             this.name = n; 
         }
     }
     /**
-     * Find a shortest path from you to the friend using BFS.
+     * Find a BFS path from you to the friend.
      * @param g the graph to be traversed 
      * @param yourName the string of your name
      * @param herName the string of friend's name
-     * @return the list of names in the path
+     * @return the list of names as a result of BFS
      */
-    String[] findMinPath(Graph g, String yourName, String herName) {
-        if(g == null)	return new String[] {"Graph is empty"};
+    ArrayList<String> BFS(Graph g, String yourName, String herName) {
+        ArrayList<String> result = new ArrayList<>();
+        result.add(yourName);
+        if(yourName.equals(herName)) return result;	
         Node start = findNodeInName(yourName, g);
         Node end = findNodeInName(herName, g);
-        if(start == end) return new String[] {"0"};    	
 
-        LinkedList<Node> q = new LinkedList<Node>();
-        ArrayList<String> result = new ArrayList<>();
+        Queue<Node> q = new ArrayDeque<Node>();
         for(Node u : g.nodes)	// reset the states
             u.state = State.Unvisited;
 
         // start traversing
-        start.state = State.Visiting;
-        q.add(start);    	
+        q.add(start);  
         Node u;
         while(!q.isEmpty()) {
-            u = q.removeFirst();	// dequeue
-            result.add(u.name);
-            if(u != null) {
-                // add adjacent nodes if Unvisited 
-                for(Node v : u.followers.toArray(new Node[u.followers.size()])) {
-                    if(v.state == State.Unvisited) {
-                        if(v == end) { // target is found
-                            result.add(v.name);
-                            return result.toArray(new String[result.size()]);	
-                        }
-                        else {    						
-                            q.add(v);
-                            v.state = State.Visiting;    						
-                        }    					
-                    }    					
+            u = q.remove();    	
+            result.add(u.name);	
+            for(Node v : u.followers) {    	
+                if(v.state == State.Visited)	continue;				 
+                if(v == end) { // target is found
+                    result.add(v.name); 
+                    return result;	
                 }
-                u.state = State.Visited;    			
-            }    		
-        }
-        return new String[] {"Target wasn't found"};	
+                q.add(v);
+                v.state = State.Visited;   					
+            }			
+        }    	
+        return result;
     }
+
     /**
-     * See if a friend can reach me using DFS and return the number of paths.
+     * Find a shortest path from you to the friend.
+     * @param result the list of names as a result of BFS
+     * @param g the graph to be traversed 
+     * @param start the string of starting point
+     * @return the list of shortest path in reverse order
+     */
+    ArrayList<String> findMinPath1(ArrayList<String> result, Graph g, String start){
+        ArrayList<String> path = new ArrayList<String>();
+        return findMinPath2(result, g, start, path);
+    }
+    ArrayList<String> findMinPath2(ArrayList<String> result, Graph g, String start, ArrayList<String> path) {    	
+        if(result.size() == 1)	{ // base case
+            path.add(start);
+            return path;
+        }  		
+        int len = result.size();   	
+        String prev = result.get(len-2);
+        path.add(result.get(len-1));
+        result = BFS(g, start, prev);
+        findMinPath2(result, g, start, path);  // recursion	
+        return path;
+    }
+
+    /**
+     * See if a friend can reach me using DFS.
      * @param g the graph to be traversed 
      * @param yourName the string of your name
      * @param herName the string of friend's name
-     * @return the number of possible paths. If not reachable it returns 0.
+     * @return true is it's reachable and false otherwise
      */
-    int isReachable(Graph g, String yourName, String herName) {
-        if(g == null)	return 0;
+    boolean found = false;
+    boolean isReachable(Graph g, String yourName, String herName) {
         for(Node u : g.nodes)	// reset the states
-            u.state = State.Unvisited;
-        int count = 0;
-        count = isReachable(g, yourName, herName, count);
-        return count;
+            u.state = State.Unvisited;    	
+        isReachable2(g, yourName, herName);
+        return found;
+    }    
+    void isReachable2(Graph g, String yourName, String herName) {   	
+        Node root = findNodeInName(yourName, g);
+        if(root == null)	return;
+
+        // base case of recursion
+        if(root.name.equals(herName)) {
+            found = true;
+            return;
+        }    	 
+        root.state = State.Visited;    	    	
+        for(Node v : root.followers) {
+            if(v.state == State.Unvisited) 
+                isReachable2(g, v.name, herName);   			
+        } 
     }
-    int isReachable(Graph g, String yourName, String herName, int count) {
+
+    /**
+     * Count the number of path as well as print them.
+     * @param g the graph
+     * @param yourName the start point
+     * @param herName the end point
+     */
+    void DFS(Graph g, String yourName, String herName) {
+        ArrayList<String> path = new ArrayList<>();
+        path.add(yourName);
+        int count = 0;
+        count = DFS(g, yourName, herName, path, count);
+        System.out.println("count is : "+ count);
+    }
+    int DFS(Graph g, String yourName, String herName, ArrayList<String> path, int count) {
         Node root = findNodeInName(yourName, g);
         if(root == null) {
             System.out.println("The account doesn't exist.");
-            return count;
+            return 0;
         }
         if(root.name.equals(herName)) {	// base case of recursion
-            count++;
-            return count;
+            for(String s : path)
+                System.out.print(s + " ");
+            System.out.println();
+            return count + 1;
         }
         root.state = State.Visited;    	    	
-        for(Node v : root.followers.toArray(new Node[root.followers.size()])) {
+        for(Node v : root.followers) {
             if(v.state == State.Unvisited) {
-                count = isReachable(g, v.name, herName, count);
+                path.add(v.name);
+                count = DFS(g, v.name, herName, path, count);   
+                path.remove(v.name);
             }    			
-        }      	
-        return count;    	
+        }  
+        root.state = State.Unvisited;
+        return count;
     }
     /**
      * Helper: Find a node in name. 
@@ -126,7 +180,7 @@ public class STEP_W4_HW1 {
      */
     Node findNodeInNumber(int nodeNumber, Graph g) {
         for(Node n : g.nodes)
-            if(n.nodeNumber == nodeNumber)	return n;
+            if(n.number == nodeNumber)	return n;
         return null;
     }
     /**
@@ -225,25 +279,15 @@ public class STEP_W4_HW1 {
      * Run test cases. Assume node# starts from 0.
      */
     void test() {   
-        int V = 7;
-        int[][] edges = new int[][] {{0,1},{0,2},{1,0},{1,3},{2,0},{2,4},{2,6},{3,1},{3,4},{3,5},{4,2},{4,3},{4,5},{5,3},{5,4},{6,2}};    		
-        Graph g = createTestGraph(edges, V);    	
-        printMinPath(findMinPath(g, "1", "4") ,"1", "4");
-        printMinPath(findMinPath(g, "1", "7"), "1", "7");
-        printMinPath(findMinPath(g, "3", "6"), "3", "6");
-        System.out.println("\nNumber of paths (0 -> 4): " + isReachable(g, "0", "4"));
-        System.out.println("\nNumber of paths (2 -> 6): " + isReachable(g, "2", "6"));
+        int V = 5;  
+        int[][] edges = new int[][] {{0,1},{0,2},{1,0},{1,2},{1,3},{2,0},{2,1},{2,3},{2,4},{3,1},{3,2},{3,4},{4,2},{4,3}};    
+        Graph g = createTestGraph(edges, V);   
 
-        V = 1;
-        edges = new int[][] {{0,0}};    		
-        g = createTestGraph(edges, V);    	
-        printMinPath(findMinPath(g, "0", "0"), "0", "0");
-
-        V = 0;
-        edges= new int[][] {{}};    		
-        g = createTestGraph(edges, V);    	
-        printMinPath(findMinPath(g, "", ""), "", "");
-        System.out.println("\nNumber of paths: " + isReachable(g, "", ""));    	
+        ArrayList<String> result = BFS(g, "2", "6");
+        result = findMinPath1(result, g, "2");
+        printMinPath(result ,"2", "6");    	
+        DFS(g, "0", "1");  
+        System.out.println(isReachable(g, "0", "3"));
     }
     /**
      * Create a graph for testing purpose.
@@ -272,11 +316,10 @@ public class STEP_W4_HW1 {
      * @param start the string of name as a starting point
      * @param end the string of name as a ending point
      */
-    void printMinPath(String[] result, String start, String end) {
+    void printMinPath(ArrayList<String> result, String start, String end) {
         System.out.print("Min path (" + start+ " -> " + end+ "): ");
-        for(String s: result)
-            System.out.print(s + " ");
-        System.out.println();
+        for(int i = result.size()-1; i >= 0; i--)
+            System.out.print(result.get(i) + " ");
     }
 
     public static void main(String args[]) {	
@@ -284,36 +327,29 @@ public class STEP_W4_HW1 {
         //Graph g = graph.createGraph(6);   
         //graph.findHighestRankedPage(g);
 
-        System.out.println("Test start-------------------------");
-        System.out.println();
-
         graph.test();
 
-        System.out.println();
-        System.out.println("Test end---------------------------");
-        System.out.println();
-
-        System.out.println("SNS investigation start------------");   
-        System.out.println();
-
-        int V = 54;	// number of vertices(students)
-        Graph g = graph.createGraph(V);
-
-        System.out.println("■　adrianからあなたまでたどり着けますか？");
-        int n = graph.isReachable(g, "helen", "adrian");
-        if(n != 0)	System.out.println("Yes");
-        else		System.out.println("No");
-
-        System.out.println("■　いくつパスが存在するでしょうか？");
-        System.out.println(n);
-
-        System.out.println("■　あなたからhughまでの最短パスは？");
-        graph.printMinPath(graph.findMinPath(g, "helen", "hugh"), "helen", "hugh");
-
-        System.out.println("■　一番ページランクの高い人は？");
-        graph.findHighestRankedPage(g);
-
-        System.out.println();
-        System.out.println("SNS investigation end  ------------");
+    //    	System.out.println("SNS investigation start------------");   
+    //    	System.out.println();
+    //    	
+    //    	int V = 54;	// number of vertices(students)
+    //    	Graph g = graph.createGraph(V);
+    //    	
+    //    	System.out.println("■　adrianからあなたまでたどり着けますか？");
+    //    	int n = graph.isReachable(g, "helen", "adrian");
+    //    	if(n != 0)	System.out.println("Yes");
+    //    	else		System.out.println("No");
+    //    	
+    //    	System.out.println("■　いくつパスが存在するでしょうか？");
+    //    	System.out.println(n);
+    //    	
+    //    	System.out.println("■　あなたからhughまでの最短パスは？");
+    //    	graph.printMinPath(graph.findMinPath(g, "helen", "hugh"), "helen", "hugh");
+    //    	
+    //    	System.out.println("■　一番ページランクの高い人は？");
+    //    	graph.findHighestRankedPage(g);
+    //    	
+    //    	System.out.println();
+    //    	System.out.println("SNS investigation end  ------------");
     }
 }
