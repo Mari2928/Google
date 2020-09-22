@@ -11,7 +11,7 @@ public class STEP_W2_HW4 {
     private Node head = null;
     private Node tail = null;
     private int cacheSize;
-    private HashMap<String, Node> map = new HashMap<String, Node>();;
+    private HashMap<String, Node> map = new HashMap<String, Node>();
 
     /**
      * Constructor: initialize cache size, HashMap, and head Node 
